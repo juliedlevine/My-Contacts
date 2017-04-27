@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #5b5970;
+    background: url('/phone.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
+}
+.heading {
+    text-align: center;
+    margin: 0;
+    padding: 40px 0 17px;
+    color: white;
+}
+.contact-form {
+    width: 450px;
+    margin: 19px auto;
+}
+.my-contacts {
+    margin: 21px auto;
+    padding: 33px;
+    width: 519px;
+    background-color: white;
+}
+label {
+    margin-top: 10px;
+}
+.each-contact p {
+    margin: 0
+}
+.each-contact h4 {
+    margin-bottom: 2px;
+}
+.btn {
+    background-color: #777e89;
+    border-color: #777e89;
+
+}
+.btn-danger {
+    float: right;
+    margin-top: -40px;
+}
+.btn-success {
+    float: right;
+    margin-top: -40px;
+    margin-right: 71px;
+}
+.btn-info {
+    margin: 0 10px 37px 0;
+}
+.add-button {
+    margin-left: 90px;
+}
+.line {
+    width: 450px;
+    height: 1px;
+    background-color: gray;
+    margin-bottom: 30px;
+}
+.radio {
+    margin: 0;
+}
