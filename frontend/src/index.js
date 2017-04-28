@@ -36,7 +36,7 @@ class EachContact extends React.Component {
                 <h4>{this.props.name} - {this.props.type}</h4>
                 <p>{this.props.phone}</p>
                 <p>{this.props.email}</p>
-                <button className="btn btn-success" type="submit" onClick={this.props.editContact}>Edit</button>
+                <button data-toggle="modal" data-target="#myModal" className="btn btn-success" type="submit" onClick={this.props.editMode}>Edit</button>
                 <button className="btn btn-danger" type="submit" onClick={this.props.deleteContact}>Delete</button>
                 <div className="line"></div>
             </div>
@@ -49,12 +49,14 @@ class MyContacts extends React.Component {
         super();
         this.state = {
             contacts: [],
+            id: '',
             name: '',
             phone: '',
             email: '',
             type: '',
             favorite: 'no',
-            show_favorites: false
+            show_favorites: false,
+            mode: null,
         }
     }
 
@@ -86,6 +88,8 @@ class MyContacts extends React.Component {
         })
         // After the database adds the contact it will return a JSON object representation of that contact, update the contacts state by adding that contact object. This will in turn update the DOM.
         .then((result) => {
+            // Cheat to clear form fields in bootstrap form (state already reflects cleared fields).
+            $('form').get(0).reset();
             console.log(result.name + ' added to the database.');
             this.state.contacts.push(result);
             this.setState({
@@ -97,17 +101,13 @@ class MyContacts extends React.Component {
                 favorite: 'no'
             })
         })
-
     }
 
     deleteContact(id) {
-        // Grab the id of the item to delete. This is sent over from render.
-        var del_id = {"id" : id}
-        // Send that ID over to the server to delete it form the database.
+        // Send ID as a param over to the server to delete it form the database.
         $.ajax({
-            method: 'POST',
-            url: 'http://localhost:5000/api/delete',
-            data: JSON.stringify(del_id),
+            method: 'DELETE',
+            url: 'http://localhost:5000/api/contact/' + id,
             contentType: 'application/json'
         })
         // If that's successful, delete it from the state as well which will in turn update the DOM
@@ -117,15 +117,49 @@ class MyContacts extends React.Component {
                 return contact.id !== result.id;
             });
             this.setState({
+                contacts: this.state.contacts,
+                name: '',
+                phone: '',
+                email: '',
+                type: '',
+                favorite: 'no'
+            })
+        })
+    }
+
+    editContact() {
+        this.setState({mode: 'edit'});
+        var edit_contact = {
+            id: this.state.id,
+            name: this.state.name,
+            phone: this.state.phone,
+            email: this.state.email,
+            type: this.state.type,
+            favorite: this.state.favorite
+        }
+        // Remove old contact from contacts state array, but dont set state yet.
+        this.state.contacts = this.state.contacts.filter(function(contact) {
+            return contact.id !== edit_contact.id;
+        });
+        // Send ID as a param over to the server to update it in the database.
+        $.ajax({
+            method: 'PUT',
+            url: 'http://localhost:5000/api/contact/' + this.state.id,
+            data: JSON.stringify(edit_contact),
+            contentType: 'application/json'
+        })
+        // If that's successful, add the newly updated contact to the contacts state array which will update the DOM
+        .then((result) => {
+            $('form').get(0).reset();
+            console.log('Contact at ID ' + result.id + ' updated in database.');
+            this.state.contacts.push(result);
+            this.setState({
                 contacts: this.state.contacts
             })
         })
     }
 
-    editContact(index) {
-        console.log('Do something!');
-    }
-
+    // Allow form inputs to reflect state
     changeState(stateName, event) {
         this.setState({
             [stateName]: event.target.value
@@ -138,50 +172,69 @@ class MyContacts extends React.Component {
         })
     }
 
+    addMode() {
+        this.setState({
+            mode: "add"
+        })
+    }
+
+    editMode(index) {
+        // Code to update form inputs with data of person i clicked on - doenst work though.
+        this.setState({
+            mode: "edit",
+            id: this.state.contacts[index].id,
+            name: this.state.contacts[index].name,
+            phone: this.state.contacts[index].phone,
+            email: this.state.contacts[index].email,
+            type: this.state.contacts[index].type,
+            favorite: this.state.contacts[index].favorite
+        })
+    }
+
     render() {
-        console.log(this.state.contacts)
+        console.log('Mode: ' + this.state.mode);
         return(
             <div className="main">
                 <h2 className="heading">My Contacts</h2>
 
                 <div className="my-contacts">
-                    <button type="button" className="btn btn-info btn-md add-button" data-toggle="modal" data-target="#myModal">Add New Contact</button>
-                    <div className="modal fade" id="myModal" role="dialog">
+                    <button type="button" className="btn btn-info btn-md add-button" data-toggle="modal" data-target="#myModal" onClick={() => this.addMode()}>Add New Contact</button>
+                    <div className="modal" id="myModal" role="dialog">
                         <div className="modal-dialog">
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <button type="button" className="close" data-dismiss="modal">&times;</button>
-                                    <h4 className="modal-title">Add New Contact</h4>
+                                    <h4 className="modal-title">{this.state.mode === 'edit' ? "Edit Contact" : "Add New Contact"}</h4>
                                 </div>
 
                                 <div className="modal-body form-group contact-form">
+                                    <form>
+                                        <TextInput label="Name:" value={this.state.name} onChange={event=> this.changeState('name', event)}/>
 
+                                        <TextInput label="Phone Number:" value={this.state.phone} onChange={event=> this.changeState('phone', event)}/>
 
-                                    <TextInput label="Name:" value={this.state.name} onChange={event=> this.changeState('name', event)}/>
+                                        <TextInput label="Email:" value={this.state.email} onChange={event=> this.changeState('email', event)}/>
 
-                                    <TextInput label="Phone Number:" value={this.state.phone} onChange={event=> this.changeState('phone', event)}/>
+                                        <label>Type: </label>
+                                        <select
+                                        className="form-control"
+                                        value={this.state.type}
+                                        onChange={event=> this.changeState('type', event)}>
+                                        <option>Select One</option>
+                                        <option value="Friend">Friend</option>
+                                        <option value="Family">Family</option>
+                                        <option value="Colleague">Colleague</option>
+                                        </select>
 
-                                    <TextInput label="Email:" value={this.state.email} onChange={event=> this.changeState('email', event)}/>
-
-                                    <label>Type: </label>
-                                    <select
-                                    className="form-control"
-                                    value={this.state.type}
-                                    onChange={event=> this.changeState('type', event)}>
-                                    <option>Select One</option>
-                                    <option value="Friend">Friend</option>
-                                    <option value="Family">Family</option>
-                                    <option value="Colleague">Colleague</option>
-                                    </select>
-
-                                    <label>Favorite? </label>
-                                    <RadioOption label="No" value="no" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
-                                    <RadioOption label="Yes" value="yes" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
-
+                                        <label>Favorite? </label>
+                                        <RadioOption label="No" value="no" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
+                                        <RadioOption label="Yes" value="yes" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
+                                    </form>
                                 </div>
                                 <div className="modal-footer">
-                                    <button  className="btn btn-primary" type="submit" onClick={() => this.addContact()}>Submit</button>
+                                    <button data-dismiss="modal" className="btn btn-primary" type="submit" onClick={this.state.mode === 'add' ? () => this.addContact() : () => this.editContact()}>Submit</button>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -192,22 +245,16 @@ class MyContacts extends React.Component {
                     {this.state.contacts.map((contact, index) => {
                         if (this.state.show_favorites && contact.favorite === 'yes') {
                             return (
-                            <EachContact key={contact.id} index={index} name={contact.name} type={contact.type} phone={contact.phone} email={contact.email} editContact={event=> this.editContact(index)}
+                            <EachContact key={contact.id} index={index} name={contact.name} type={contact.type} phone={contact.phone} email={contact.email}
+                            editMode={event=> this.editMode(index)}
                             deleteContact={event=> this.deleteContact(contact.id)}/>)
                         } else if (!this.state.show_favorites) {
                             return (
                             <EachContact key={contact.id} index={index} name={contact.name} type={contact.type} phone={contact.phone} email={contact.email}
-                            editContact={event=> this.editContact(index)}
+                            editMode={event=> this.editMode(index)}
                             deleteContact={event=> this.deleteContact(contact.id)}/>)
                         }
                     })}
-                    <div>
-                    {this.state.name},
-                    {this.state.phone},
-                    {this.state.email},
-                    {this.state.type},
-                    {this.state.favorite},
-                    </div>
                 </div>
 
             </div>
