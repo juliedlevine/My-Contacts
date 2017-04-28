@@ -33,7 +33,7 @@ class EachContact extends React.Component {
     render() {
         return (
             <div className="each-contact">
-                <h4>{this.props.name} - {this.props.type}</h4>
+                <h4>{this.props.name} - {this.props.type} <img className={this.props.heart} src="/heart.png"/></h4>
                 <p>{this.props.phone}</p>
                 <p>{this.props.email}</p>
                 <button data-toggle="modal" data-target="#myModal" className="btn btn-success" type="submit" onClick={this.props.editMode}>Edit</button>
@@ -179,7 +179,7 @@ class MyContacts extends React.Component {
     }
 
     editMode(index) {
-        // Code to update form inputs with data of person i clicked on - doenst work though.
+        // Code to update form inputs with data of person i clicked on - doesn't work though.
         this.setState({
             mode: "edit",
             id: this.state.contacts[index].id,
@@ -193,68 +193,72 @@ class MyContacts extends React.Component {
 
     render() {
         console.log('Mode: ' + this.state.mode);
+        console.log(this.state.name);
         return(
             <div className="main">
                 <h2 className="heading">My Contacts</h2>
 
+                {/* Add/Show Favorites Buttons */}
                 <div className="my-contacts">
                     <button type="button" className="btn btn-info btn-md add-button" data-toggle="modal" data-target="#myModal" onClick={() => this.addMode()}>Add New Contact</button>
-                    <div className="modal" id="myModal" role="dialog">
-                        <div className="modal-dialog">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <button type="button" className="close" data-dismiss="modal">&times;</button>
-                                    <h4 className="modal-title">{this.state.mode === 'edit' ? "Edit Contact" : "Add New Contact"}</h4>
-                                </div>
-
-                                <div className="modal-body form-group contact-form">
-                                    <form>
-                                        <TextInput label="Name:" value={this.state.name} onChange={event=> this.changeState('name', event)}/>
-
-                                        <TextInput label="Phone Number:" value={this.state.phone} onChange={event=> this.changeState('phone', event)}/>
-
-                                        <TextInput label="Email:" value={this.state.email} onChange={event=> this.changeState('email', event)}/>
-
-                                        <label>Type: </label>
-                                        <select
-                                        className="form-control"
-                                        value={this.state.type}
-                                        onChange={event=> this.changeState('type', event)}>
-                                        <option>Select One</option>
-                                        <option value="Friend">Friend</option>
-                                        <option value="Family">Family</option>
-                                        <option value="Colleague">Colleague</option>
-                                        </select>
-
-                                        <label>Favorite? </label>
-                                        <RadioOption label="No" value="no" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
-                                        <RadioOption label="Yes" value="yes" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
-                                    </form>
-                                </div>
-                                <div className="modal-footer">
-                                    <button data-dismiss="modal" className="btn btn-primary" type="submit" onClick={this.state.mode === 'add' ? () => this.addContact() : () => this.editContact()}>Submit</button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-
                     <button className="btn btn-info" onClick={() => this.toggleFavorites()}>{this.state.show_favorites ? 'Show All' : 'Only Show Favorites' }</button>
 
+                    {/* Each Contact List */}
                     {this.state.contacts.map((contact, index) => {
-                        if (this.state.show_favorites && contact.favorite === 'yes') {
+                        if (contact.favorite === 'yes') {
                             return (
                             <EachContact key={contact.id} index={index} name={contact.name} type={contact.type} phone={contact.phone} email={contact.email}
                             editMode={event=> this.editMode(index)}
-                            deleteContact={event=> this.deleteContact(contact.id)}/>)
+                            deleteContact={event=> this.deleteContact(contact.id)}
+                            heart={'heart_show'} />)
                         } else if (!this.state.show_favorites) {
                             return (
                             <EachContact key={contact.id} index={index} name={contact.name} type={contact.type} phone={contact.phone} email={contact.email}
                             editMode={event=> this.editMode(index)}
+                            heart={'heart_hide'}
                             deleteContact={event=> this.deleteContact(contact.id)}/>)
                         }
                     })}
+                </div>
+
+                {/* Modal Pop up Form */}
+                <div className="modal" id="myModal" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal">&times;</button>
+                                <h4 className="modal-title">{this.state.mode === 'edit' ? "Edit Contact" : "Add New Contact"}</h4>
+                            </div>
+                            <div className="modal-body form-group contact-form">
+                                <form>
+                                    <TextInput label="Name:" value={this.state.name} onChange={event=> this.changeState('name', event)}/>
+
+                                    <TextInput label="Phone Number:" value={this.state.phone} onChange={event=> this.changeState('phone', event)}/>
+
+                                    <TextInput label="Email:" value={this.state.email} onChange={event=> this.changeState('email', event)}/>
+
+                                    <label>Type: </label>
+                                    <select
+                                    className="form-control"
+                                    value={this.state.type}
+                                    onChange={event=> this.changeState('type', event)}>
+                                    <option>Select One</option>
+                                    <option value="Friend">Friend</option>
+                                    <option value="Family">Family</option>
+                                    <option value="Colleague">Colleague</option>
+                                    </select>
+
+                                    <label>Favorite? </label>
+                                    <RadioOption label="No" value="no" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
+                                    <RadioOption label="Yes" value="yes" favorite={this.state.favorite} onChange={event=> this.changeState('favorite', event)}/>
+                                </form>
+                            </div>
+
+                            <div className="modal-footer">
+                                <button data-dismiss="modal" className="btn btn-primary" type="submit" onClick={this.state.mode === 'add' ? () => this.addContact() : () => this.editContact()}>Submit</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

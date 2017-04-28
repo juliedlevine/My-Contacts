@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 // Get all contacts from database and send over to front end
 app.get('/api/contacts', (req, resp, next) => {
-    db.any(`Select * from contact`)
+    db.any(`Select * from contact order by name`)
         .then(result => resp.json(result))
         .catch(next);
 })

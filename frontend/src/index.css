@@ -11,6 +11,8 @@ body {
 
 }
 .heading {
+    font-size: 40px;
+    font-family: 'Vibur', cursive;
     text-align: center;
     margin: 0;
     padding: 40px 0 17px;
@@ -21,6 +23,7 @@ body {
     margin: 19px auto;
 }
 .my-contacts {
+    opacity: 0.9;
     margin: 21px auto;
     padding: 33px;
     width: 519px;
@@ -33,6 +36,8 @@ label {
     margin: 0
 }
 .each-contact h4 {
+    font-size: 25px;
+    font-family: 'Vibur', cursive;
     margin-bottom: 2px;
 }
 .btn {
@@ -60,6 +65,15 @@ label {
     height: 1px;
     background-color: gray;
     margin-bottom: 30px;
+    margin-top: 9px;
+}
+.heart_show {
+    width: 21px;
+    display: inline-block;
+    margin-top: -4px;
+}
+.heart_hide {
+    display: none;
 }
 .radio {
     margin: 0;
