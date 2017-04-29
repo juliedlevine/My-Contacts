@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import classnames from 'classnames';
 
-
+// Input fields
 class TextInput extends React.Component {
     render() {
         return (
@@ -19,6 +19,7 @@ class TextInput extends React.Component {
     }
 }
 
+// Radio button options
 class RadioOption extends React.Component {
     render() {
         return(
@@ -29,6 +30,7 @@ class RadioOption extends React.Component {
     }
 }
 
+// Contacts list
 class EachContact extends React.Component {
     render() {
         return (
